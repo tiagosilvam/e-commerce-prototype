@@ -26,7 +26,6 @@ const handleLogin = async (values: z.infer<typeof CardSchema>) => {
 export default function Payment() {
   const { cart, getCartValue } = useShoppingCart();
   const {
-    register,
     control,
     formState: { errors },
     handleSubmit,
@@ -34,7 +33,7 @@ export default function Payment() {
     resolver: zodResolver(CardSchema),
     defaultValues: {
       cardNumber: "1234123412341234",
-      cardName: "João da S Oliveira",
+      cardName: "Joao da S Oliveira",
       cardDate: "05/25",
       cardCvv: "123",
       cardInstallments: 1,
@@ -58,60 +57,92 @@ export default function Payment() {
           >
             <Grid container rowSpacing={1} columnSpacing={2}>
               <Grid item xs={12}>
-                <Input
-                  label="Número do cartão"
-                  {...register("cardNumber")}
-                  error={!!errors.cardNumber}
-                  helperText={errors.cardNumber?.message}
-                  variant="outlined"
-                  InputProps={{
-                    inputComponent: MaskedInput,
-                    inputProps: {
-                      mask: "0000 0000 0000 0000",
-                    },
-                  }}
+                <Controller
+                  name="cardNumber"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      label="Número do cartão"
+                      variant="outlined"
+                      error={!!errors.cardNumber}
+                      helperText={errors.cardNumber?.message}
+                      fullWidth
+                      InputProps={{
+                        inputComponent: MaskedInput,
+                        inputProps: {
+                          mask: "0000 0000 0000 0000",
+                        },
+                      }}
+                    />
+                  )}
                 />
               </Grid>
               <Grid item xs={12}>
-                <Input
-                  label="Nome impresso no cartão"
-                  variant="outlined"
-                  fullWidth
-                  {...register("cardName")}
-                  error={!!errors?.cardName}
-                  helperText={errors.cardName?.message}
+                <Controller
+                  name="cardName"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      label="Nome impresso no cartão"
+                      variant="outlined"
+                      error={!!errors.cardName}
+                      helperText={errors.cardName?.message}
+                      fullWidth
+                      InputProps={{
+                        inputComponent: MaskedInput,
+                        inputProps: {
+                          mask: /[a-z ]$/i,
+                          prepareChar: (str: string) => str.toUpperCase(),
+                        },
+                      }}
+                    />
+                  )}
                 />
               </Grid>
               <Grid item xs={6}>
-                <Input
-                  label="Validade"
-                  variant="outlined"
-                  fullWidth
-                  {...register("cardDate")}
-                  error={!!errors?.cardDate}
-                  helperText={errors.cardDate?.message}
-                  InputProps={{
-                    inputComponent: MaskedInput,
-                    inputProps: {
-                      mask: "00/00",
-                    },
-                  }}
+                <Controller
+                  name="cardDate"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      label="Validade"
+                      variant="outlined"
+                      fullWidth
+                      error={!!errors?.cardDate}
+                      helperText={errors.cardDate?.message}
+                      InputProps={{
+                        inputComponent: MaskedInput,
+                        inputProps: {
+                          mask: "00/00",
+                        },
+                      }}
+                    />
+                  )}
                 />
               </Grid>
               <Grid item xs={6}>
-                <Input
-                  label="CVV"
-                  variant="outlined"
-                  fullWidth
-                  {...register("cardCvv")}
-                  error={!!errors?.cardCvv}
-                  helperText={errors.cardCvv?.message}
-                  InputProps={{
-                    inputComponent: MaskedInput,
-                    inputProps: {
-                      mask: "000",
-                    },
-                  }}
+                <Controller
+                  name="cardCvv"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      label="CVV"
+                      variant="outlined"
+                      fullWidth
+                      error={!!errors?.cardCvv}
+                      helperText={errors.cardCvv?.message}
+                      InputProps={{
+                        inputComponent: MaskedInput,
+                        inputProps: {
+                          mask: "000",
+                        },
+                      }}
+                    />
+                  )}
                 />
               </Grid>
               <Grid item xs={6}>
