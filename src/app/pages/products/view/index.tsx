@@ -12,11 +12,46 @@ import { AddCardRounded, ProductionQuantityLimits } from "@mui/icons-material";
 import { Button, Input, Loader, MaskedInput } from "components";
 import { useShoppingCart } from "hooks";
 import { fetcher, formatCurrency } from "utils";
+import axios from "axios";
+import { Controller, UseFormSetError, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CepSchema } from "schemas/CepSchema";
+import { z } from "zod";
+import { useState } from "react";
+
+const searchCEP = async (
+  cep: string,
+  setFormError: UseFormSetError<z.infer<typeof CepSchema>>,
+) => {
+  return await axios
+    .get(
+      `https://viacep.com.br/ws/${cep.replaceAll(".", "").replaceAll("-", "")}/json/`,
+    )
+    .then(({ data }) => {
+      if (data.erro) {
+        setFormError("cep", {
+          message: "CEP não encontrado",
+        });
+        return null;
+      }
+      return data;
+    });
+};
 
 export default function ProductView() {
   const { productId } = useParams();
   const { cart, addItem, updateItem } = useShoppingCart();
   const navigate = useNavigate();
+  const [city, setCity] = useState<CEP>();
+  const {
+    control,
+    formState: { errors },
+    setError,
+    handleSubmit,
+  } = useForm<z.infer<typeof CepSchema>>({
+    resolver: zodResolver(CepSchema),
+    mode: "all",
+  });
 
   const {
     data: product,
@@ -91,31 +126,70 @@ export default function ProductView() {
         >
           <Paper className="rounded-xl p-6 shadow-md">
             <Typography className="text-2xl font-bold">
-              R$ {formatCurrency(product.price)}
-            </Typography>
-            <Typography>A vista no PIX com 10% OFF</Typography>
-            <Typography className="my-2">ou</Typography>
-            <Typography className="font-bold">
               R$ {formatCurrency(product.price - product.price * 0.1)}
             </Typography>
-            <Typography>Em até 10x no cartão de crédito</Typography>
+            <Typography className="text-sm">
+              A vista no PIX com 10% OFF
+            </Typography>
+            <Typography className="my-2">ou</Typography>
+            <Typography className="font-bold">
+              R$ {formatCurrency(product.price)}
+            </Typography>
+            <Typography className="text-sm">
+              Em até 10x no cartão de crédito
+            </Typography>
           </Paper>
-          <Paper className="flex flex-col space-y-2 rounded-xl p-6 pb-2 shadow-md">
-            <Typography>Calcular frete e prazo</Typography>
-            <div className="flex items-center space-x-2">
-              <Input
-                placeholder="Informe seu CEP"
-                fullWidth
-                variant="outlined"
-                InputProps={{
-                  inputComponent: MaskedInput,
-                  inputProps: {
-                    mask: "00.000-000",
-                  },
-                }}
+          <Paper className="flex flex-col rounded-xl p-6 shadow-md">
+            <Typography className="mb-2 font-bold">
+              Calcular frete e prazo
+            </Typography>
+            <form
+              className="flex items-center space-x-2"
+              onSubmit={handleSubmit(({ cep }) =>
+                searchCEP(cep, setError)
+                  .then(setCity)
+                  .catch(() =>
+                    setError("cep", {
+                      message: "Houve um problema ao buscar o CEP",
+                    }),
+                  ),
+              )}
+            >
+              <Controller
+                control={control}
+                name="cep"
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    placeholder="Informe seu CEP"
+                    fullWidth
+                    variant="outlined"
+                    InputProps={{
+                      inputComponent: MaskedInput,
+                      inputProps: {
+                        mask: "00.000-000",
+                      },
+                    }}
+                    error={!!errors.cep}
+                    helperText={errors.cep?.message}
+                  />
+                )}
               />
-              <Button className="mb-6" name="Calular" />
-            </div>
+              <Button className="mb-6" name="Calular" type="submit" />
+            </form>
+            {city && (
+              <div>
+                <Typography className="text-sm">
+                  <b>Endereço:</b> {city.logradouro}, {city.bairro}
+                </Typography>
+                <Typography className="text-sm">
+                  <b>Cidade:</b> {city.localidade} - {city.uf}
+                </Typography>
+                <Typography className="text-sm">
+                  <b>Valor do frete:</b> N/A
+                </Typography>
+              </div>
+            )}
           </Paper>
           <Paper className="flex flex-col space-y-4 rounded-xl p-6 shadow-md">
             <Button
