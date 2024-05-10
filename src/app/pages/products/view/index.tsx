@@ -8,11 +8,15 @@ import {
 } from "@mui/material";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import useSWRImmutable from "swr/immutable";
-import { AddCardRounded, ProductionQuantityLimits } from "@mui/icons-material";
+import {
+  AddCardRounded,
+  ProductionQuantityLimits,
+  Error,
+} from "@mui/icons-material";
 import { Button, Input, Loader, MaskedInput } from "components";
 import { useShoppingCart } from "hooks";
 import { fetcher, formatCurrency } from "utils";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Controller, UseFormSetError, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CepSchema } from "schemas/CepSchema";
@@ -56,9 +60,11 @@ export default function ProductView() {
   const {
     data: product,
     isLoading,
+    error,
   }: {
     data: Product;
     isLoading: boolean;
+    error?: AxiosError;
   } = useSWRImmutable(
     `${process.env.REACT_APP_PRODUCTS_API_URL}/products/${productId}`,
     fetcher,
@@ -66,6 +72,20 @@ export default function ProductView() {
 
   if (isLoading) {
     return <Loader type="linear" label="Carregando produto..." />;
+  } else if (error) {
+    return (
+      <div className="m-auto space-y-1 self-center max-sm:px-4">
+        <div className="flex items-center max-sm:flex-col max-sm:space-y-3 sm:space-x-3">
+          <Error />
+          <Typography className="max-sm:text-center">
+            Erro ao carregar produto, tente novamente mais tarde.
+          </Typography>
+        </div>
+        <Typography className="text-center text-xs italic text-gray-500">
+          Error: {error.message}
+        </Typography>
+      </div>
+    );
   } else if (!product) {
     return (
       <div className="flex w-full items-center justify-center">

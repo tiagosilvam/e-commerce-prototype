@@ -2,6 +2,7 @@ import {
   AppBar,
   Badge,
   Box,
+  CircularProgress,
   Container,
   Drawer,
   IconButton,
@@ -11,6 +12,7 @@ import {
   ListItemIcon,
   ListItemText,
   Paper,
+  Popover,
   Theme,
   Tooltip,
   Typography,
@@ -24,12 +26,15 @@ import {
   Menu,
   PersonRounded,
   Logout,
+  InfoOutlined,
 } from "@mui/icons-material";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { useTheme, useShoppingCart, useSession } from "hooks";
 import { Link, NavigateFunction, useNavigate } from "react-router-dom";
 import { Input } from "components";
-import { useRef, useState } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
+import axios from "axios";
+import { useDebouncedCallback } from "use-debounce";
 
 const pageMenuItems = [
   { label: "Todos", href: "/" },
@@ -147,8 +152,22 @@ const DrawerMenu = ({
   );
 };
 
+const handleSearch = async (
+  search: string,
+  setLoading: Dispatch<SetStateAction<boolean>>,
+) => {
+  const products: Product[] = await axios
+    .post(`${process.env.REACT_APP_PRODUCTS_API_URL}/products`)
+    .then(({ data }) => data)
+    .finally(() => setLoading(false));
+
+  return products.filter(({ title }) =>
+    title.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
+  );
+};
+
 export const Navbar = () => {
-  const ref = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const {
     palette: { mode },
@@ -157,6 +176,13 @@ export const Navbar = () => {
   const { cart } = useShoppingCart();
   const { user, signOut } = useSession();
   const [search, setSearch] = useState<string>();
+  const [searchFocus, setSearchFocus] = useState(false);
+  const [products, setProducts] = useState<Product[]>();
+  const [loading, setLoading] = useState(false);
+
+  const debounced = useDebouncedCallback((value) => {
+    handleSearch(value, setLoading).then(setProducts).catch(console.error);
+  }, 1500);
 
   return (
     <AppBar className="h-40 shadow-md" position="static">
@@ -170,16 +196,66 @@ export const Navbar = () => {
           alt="logo"
           onClick={() => navigate("/")}
         />
-        <Input
-          className="mb-2 mt-6 w-full"
-          label="Pesquisar por produtos"
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-              navigate(`/?search=${search}`);
-            }
-          }}
-        />
+        <div className="w-full">
+          <Input
+            ref={inputRef}
+            className="mb-2 mt-6 w-full"
+            label="Pesquisar por produtos"
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setLoading(true);
+              debounced(e.target.value);
+            }}
+            onFocus={() => setSearchFocus(true)}
+            autoComplete="off"
+          />
+          <Popover
+            className="mt-2 w-full"
+            anchorEl={inputRef.current}
+            open={searchFocus && !!search}
+            onClose={() => setSearchFocus(false)}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "left",
+            }}
+            disableAutoFocus
+            disablePortal
+          >
+            <div className="max-w-[700px] p-4">
+              {!loading ? (
+                products ? (
+                  products.map(({ title, image, id }) => (
+                    <div
+                      className="mt-2 flex cursor-pointer items-center space-x-3 rounded-md p-2 hover:bg-gray-200"
+                      onClick={() => navigate(`/products/${id}`)}
+                    >
+                      <img
+                        src={image}
+                        className="min-h-8 min-w-8"
+                        alt={title}
+                      />
+                      <Typography className="truncate">{title}</Typography>
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <InfoOutlined fontSize="small" className="text-gray-500" />
+                    <Typography className="text-sm italic text-gray-500">
+                      Não existem produtos a serem exibidos na pesquisa
+                    </Typography>
+                  </div>
+                )
+              ) : (
+                <div className="flex items-center space-x-4">
+                  <CircularProgress size="1.3rem" />
+                  <Typography className="text-sm italic text-gray-500">
+                    Pesquisando...
+                  </Typography>
+                </div>
+              )}
+            </div>
+          </Popover>
+        </div>
         <DrawerMenu
           headerMenuItems={headerMenuItems(
             user,
@@ -194,7 +270,6 @@ export const Navbar = () => {
       </Container>
       <Paper className="flex h-1/4 rounded-none border-none shadow-none">
         <Container
-          ref={ref}
           className="scrollbar-hide flex h-full justify-between overflow-x-auto"
           maxWidth="xl"
         >

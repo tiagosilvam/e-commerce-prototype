@@ -185,26 +185,26 @@ export default function Payment() {
             </Typography>
             <div className="space-y-1">
               <Typography>Itens no carrinho:</Typography>
-              {cart.map((product) => (
+              {cart.map(({ item: { image, id, title }, qnt }) => (
                 <div
-                  key={product.item.id}
+                  key={id}
                   className="flex items-center justify-between rounded-lg border p-2"
                 >
                   <div className="flex w-10/12 items-center space-x-4">
                     <img
                       className="h-8 w-8 object-contain"
-                      src={product.item.image}
-                      alt={product.item.title}
+                      src={image}
+                      alt={title}
                     />
                     <Typography
                       component={Link}
                       className="truncate hover:underline"
-                      to={`/product/${product.item.id}`}
+                      to={`/product/${id}`}
                     >
-                      {product.item.title}
+                      {title}
                     </Typography>
                   </div>
-                  <Typography className="mr-2">{product.qnt} un.</Typography>
+                  <Typography className="mr-2">{qnt} un.</Typography>
                 </div>
               ))}
             </div>

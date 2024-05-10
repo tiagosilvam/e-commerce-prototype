@@ -1,3 +1,4 @@
+import { Error } from "@mui/icons-material";
 import { Breadcrumbs, Container, Grid, Typography } from "@mui/material";
 import { AxiosError } from "axios";
 import { ProductCard, Loader } from "components";
@@ -10,7 +11,7 @@ export default function Products() {
   const { cart, addItem, updateItem } = useShoppingCart();
   const [searchParams] = useSearchParams();
   const categoryParam = searchParams.get("category");
-  const searchParam = searchParams.get("search");
+
   const {
     data: products,
     isLoading,
@@ -27,18 +28,24 @@ export default function Products() {
   if (isLoading) {
     return <Loader type="linear" label="Carregando produtos..." />;
   } else if (error) {
-    <Typography>
-      Erro ao carregar a lista de produtos, tente novamente mais tarde
-    </Typography>;
+    return (
+      <div className="m-auto space-y-1 self-center max-sm:px-4">
+        <div className="flex items-center max-sm:flex-col max-sm:space-y-3 sm:space-x-3">
+          <Error />
+          <Typography className="max-sm:text-center">
+            Erro ao carregar a lista de produtos, tente novamente mais tarde.
+          </Typography>
+        </div>
+        <Typography className="text-center text-xs italic text-gray-500">
+          Error: {error.message}
+        </Typography>
+      </div>
+    );
   }
 
   const filteredProducts = products.filter((product) => {
     if (categoryParam) {
       return product.category === categoryParam;
-    } else if (searchParam) {
-      return product.title
-        .toLocaleLowerCase()
-        .includes(searchParam.toLocaleLowerCase());
     }
     return product;
   });
@@ -77,7 +84,7 @@ export default function Products() {
         </Grid>
       ) : (
         <Typography>
-          Desculpe, não existem produtos a serem exibidos.
+          Desculpe, não existem produtos a serem exibidos na categoria.
         </Typography>
       )}
     </Container>
