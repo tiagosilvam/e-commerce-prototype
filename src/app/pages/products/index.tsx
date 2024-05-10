@@ -9,7 +9,8 @@ import { fetcher } from "utils";
 export default function Products() {
   const { cart, addItem, updateItem } = useShoppingCart();
   const [searchParams] = useSearchParams();
-  const searchParam = searchParams.get("category");
+  const categoryParam = searchParams.get("category");
+  const searchParam = searchParams.get("search");
   const {
     data: products,
     isLoading,
@@ -32,25 +33,28 @@ export default function Products() {
   }
 
   const filteredProducts = products.filter((product) => {
-    if (searchParams.get("category")) {
-      return product.category === searchParam;
+    if (categoryParam) {
+      return product.category === categoryParam;
+    } else if (searchParam) {
+      return product.title
+        .toLocaleLowerCase()
+        .includes(searchParam.toLocaleLowerCase());
     }
     return product;
   });
 
   return (
     <Container maxWidth="xl">
-      {searchParam ? (
+      {categoryParam ? (
         <Breadcrumbs className="py-4" separator=">">
           <Typography className="hover:underline" component={Link} to="/">
             produtos
           </Typography>
-          <Typography>{searchParam}</Typography>
+          <Typography>{categoryParam}</Typography>
         </Breadcrumbs>
       ) : (
         <Typography className="py-4 text-xl font-bold">Produtos</Typography>
       )}
-
       {filteredProducts.length > 0 ? (
         <Grid container spacing={3}>
           {filteredProducts.map((item, index) => (
@@ -73,7 +77,7 @@ export default function Products() {
         </Grid>
       ) : (
         <Typography>
-          Não existem produtos a serem exibidos na categoria '{searchParam}'.
+          Desculpe, não existem produtos a serem exibidos.
         </Typography>
       )}
     </Container>

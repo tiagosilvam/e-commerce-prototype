@@ -156,6 +156,7 @@ export const Navbar = () => {
   const { toggleColorMode } = useTheme();
   const { cart } = useShoppingCart();
   const { user, signOut } = useSession();
+  const [search, setSearch] = useState<string>();
 
   return (
     <AppBar className="h-40 shadow-md" position="static">
@@ -169,7 +170,16 @@ export const Navbar = () => {
           alt="logo"
           onClick={() => navigate("/")}
         />
-        <Input className="mb-2 mt-6 w-full" label="Pesquisar por produtos" />
+        <Input
+          className="mb-2 mt-6 w-full"
+          label="Pesquisar por produtos"
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              navigate(`/?search=${search}`);
+            }
+          }}
+        />
         <DrawerMenu
           headerMenuItems={headerMenuItems(
             user,
