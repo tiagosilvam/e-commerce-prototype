@@ -27,6 +27,7 @@ import {
   PersonRounded,
   Logout,
   InfoOutlined,
+  Search,
 } from "@mui/icons-material";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { useTheme, useShoppingCart, useSession } from "hooks";
@@ -209,6 +210,9 @@ export const Navbar = () => {
             onFocus={() => setSearchFocus(true)}
             onBlur={() => setSearchFocus(false)}
             autoComplete="off"
+            InputProps={{
+              endAdornment: <Search />,
+            }}
           />
           <Popover
             className="mt-2 w-full"
@@ -227,7 +231,7 @@ export const Navbar = () => {
                   products.map(({ title, image, id }, index) => (
                     <div
                       key={index}
-                      className="mt-2 flex cursor-pointer items-center space-x-3 rounded-md p-2 hover:bg-gray-200"
+                      className="mt-2 flex cursor-pointer items-center space-x-3 rounded-md p-2 hover:bg-gray-200/20"
                       onClick={() => navigate(`/product/${id}`)}
                     >
                       <img
