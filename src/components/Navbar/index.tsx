@@ -157,7 +157,7 @@ const handleSearch = async (
   setLoading: Dispatch<SetStateAction<boolean>>,
 ) => {
   const products: Product[] = await axios
-    .post(`${process.env.REACT_APP_PRODUCTS_API_URL}/products`)
+    .get(`${process.env.REACT_APP_PRODUCTS_API_URL}/products`)
     .then(({ data }) => data)
     .finally(() => setLoading(false));
 
@@ -207,13 +207,13 @@ export const Navbar = () => {
               debounced(e.target.value);
             }}
             onFocus={() => setSearchFocus(true)}
+            onBlur={() => setSearchFocus(false)}
             autoComplete="off"
           />
           <Popover
             className="mt-2 w-full"
             anchorEl={inputRef.current}
             open={searchFocus && !!search}
-            onClose={() => setSearchFocus(false)}
             anchorOrigin={{
               vertical: "bottom",
               horizontal: "left",
@@ -223,15 +223,16 @@ export const Navbar = () => {
           >
             <div className="max-w-[700px] p-4">
               {!loading ? (
-                products ? (
-                  products.map(({ title, image, id }) => (
+                products && products.length > 0 ? (
+                  products.map(({ title, image, id }, index) => (
                     <div
+                      key={index}
                       className="mt-2 flex cursor-pointer items-center space-x-3 rounded-md p-2 hover:bg-gray-200"
-                      onClick={() => navigate(`/products/${id}`)}
+                      onClick={() => navigate(`/product/${id}`)}
                     >
                       <img
                         src={image}
-                        className="min-h-8 min-w-8"
+                        className="h-8 min-h-8 w-8 min-w-8"
                         alt={title}
                       />
                       <Typography className="truncate">{title}</Typography>
