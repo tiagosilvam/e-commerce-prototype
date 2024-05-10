@@ -4,7 +4,8 @@ import "./globals.css";
 import { StyledEngineProvider } from "@mui/material/styles";
 import { RouterProvider } from "react-router-dom";
 import { appRoutes } from "routes";
-import { AuthProvider, ShoppingCartProvider } from "providers";
+import { AuthProvider, ShoppingCartProvider, ThemeProvider } from "providers";
+import { CssBaseline } from "@mui/material";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement,
@@ -12,11 +13,14 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <StyledEngineProvider injectFirst>
-      <ShoppingCartProvider>
-        <AuthProvider>
-          <RouterProvider router={appRoutes} />
-        </AuthProvider>
-      </ShoppingCartProvider>
+      <ThemeProvider>
+        <CssBaseline />
+        <ShoppingCartProvider>
+          <AuthProvider>
+            <RouterProvider router={appRoutes} />
+          </AuthProvider>
+        </ShoppingCartProvider>
+      </ThemeProvider>
     </StyledEngineProvider>
   </React.StrictMode>,
 );

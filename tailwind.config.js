@@ -13,6 +13,9 @@ module.exports = {
       lg: "1200px",
       xl: "1536px",
     },
+    corePlugins: {
+      preflight: false,
+    },
     extend: {
       screens: {
         xs: "0px",
