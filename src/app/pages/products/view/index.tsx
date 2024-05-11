@@ -12,6 +12,7 @@ import {
   AddShoppingCart,
   ProductionQuantityLimits,
   Error,
+  CreditCard,
 } from "@mui/icons-material";
 import { Button, Input, Loader, MaskedInput } from "components";
 import { useShoppingCart } from "hooks";
@@ -215,9 +216,17 @@ export default function ProductView() {
             <Button
               name="Comprar"
               onClick={() => {
-                addItem(product);
+                const existingItemIndex = cart.findIndex(
+                  (cartItem) => cartItem.item.id === product.id,
+                );
+                if (existingItemIndex !== -1) {
+                  updateItem(existingItemIndex, "add");
+                } else {
+                  addItem(product);
+                }
                 navigate("/payment");
               }}
+              startIcon={<CreditCard />}
             />
             <Button
               name="Adicionar ao carrinho"
