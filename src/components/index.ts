@@ -5,3 +5,4 @@ export { Login } from "components/Login";
 export { Navbar } from "components/Navbar";
 export { ProductCard } from "components/ProductCard";
 export { MaskedInput } from "components/MaskedInput";
+export { BasicModal } from "components/Modal";

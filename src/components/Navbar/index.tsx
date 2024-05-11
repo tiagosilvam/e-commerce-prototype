@@ -19,8 +19,8 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import {
-  Brightness7,
-  Brightness4,
+  LightMode,
+  ModeNight,
   FavoriteRounded,
   ShoppingCartRounded,
   Menu,
@@ -39,14 +39,10 @@ import { useDebouncedCallback } from "use-debounce";
 
 const pageMenuItems = [
   { label: "Todos", href: "/" },
-  { label: "Celulares", href: "/?category=smartphones" },
-  { label: "Eletrodomésticos", href: "/?category=eletrodomesticos" },
   { label: "Informática", href: "/?category=electronics" },
-  { label: "Eletroportáteis", href: "/?category=electronics" },
-  { label: "Homens", href: "/?category=men's clothing" },
-  { label: "Brinquedos", href: "/?category=brinquedos" },
+  { label: "Masculino", href: "/?category=men's clothing" },
   { label: "Jóias", href: "/?category=jewelery" },
-  { label: "Dia das mães", href: "/?category=women's clothing" },
+  { label: "Feminino", href: "/?category=women's clothing" },
 ];
 
 const headerMenuItems = (
@@ -78,11 +74,7 @@ const headerMenuItems = (
     {
       label: `Tema ${mode === "dark" ? "claro" : "escuro"}`,
       icon:
-        mode === "dark" ? (
-          <Brightness7 color="primary" />
-        ) : (
-          <Brightness4 className="text-white" />
-        ),
+        mode === "dark" ? <LightMode /> : <ModeNight className="text-white" />,
       action: () => toggleColorMode(),
     },
   ];
@@ -201,7 +193,7 @@ export const Navbar = () => {
           <Input
             ref={inputRef}
             className="mb-2 mt-6 w-full"
-            label="Pesquisar por produtos"
+            label="Pesquisar"
             onChange={(e) => {
               setSearch(e.target.value);
               setLoading(true);
@@ -275,7 +267,7 @@ export const Navbar = () => {
       </Container>
       <Paper className="flex h-1/4 rounded-none border-none shadow-none">
         <Container
-          className="scrollbar-hide flex h-full justify-between overflow-x-auto"
+          className="scrollbar-hide flex h-full justify-evenly overflow-x-auto"
           maxWidth="xl"
         >
           {pageMenuItems.map(({ label, href }) => (

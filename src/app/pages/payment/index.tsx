@@ -32,10 +32,10 @@ export default function Payment() {
   } = useForm<z.infer<typeof CardSchema>>({
     resolver: zodResolver(CardSchema),
     defaultValues: {
-      cardNumber: "1234123412341234",
-      cardName: "Joao da S Oliveira",
-      cardDate: "05/25",
-      cardCvv: "123",
+      // cardNumber: "1234123412341234",
+      // cardName: "Joao da S Oliveira",
+      // cardDate: "05/25",
+      // cardCvv: "123",
       cardInstallments: 1,
     },
     mode: "all",

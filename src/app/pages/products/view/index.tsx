@@ -9,7 +9,7 @@ import {
 import { Link, useNavigate, useParams } from "react-router-dom";
 import useSWRImmutable from "swr/immutable";
 import {
-  AddCardRounded,
+  AddShoppingCart,
   ProductionQuantityLimits,
   Error,
 } from "@mui/icons-material";
@@ -221,7 +221,7 @@ export default function ProductView() {
             />
             <Button
               name="Adicionar ao carrinho"
-              startIcon={<AddCardRounded />}
+              startIcon={<AddShoppingCart />}
               onClick={() => {
                 const existingItemIndex = cart.findIndex(
                   (cartItem) => cartItem.item.id === product.id,

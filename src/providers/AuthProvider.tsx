@@ -1,7 +1,7 @@
-import { useApi } from "hooks";
 import { ReactNode, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { AuthContext } from "contexts";
+import axios from "axios";
 
 export const AuthProvider = ({
   children,
@@ -11,7 +11,6 @@ export const AuthProvider = ({
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const storageUser = localStorage.getItem("auth");
-  const { api } = useApi();
 
   useEffect(() => {
     setTimeout(() => {
@@ -23,12 +22,12 @@ export const AuthProvider = ({
   }, [storageUser]);
 
   const signIn = async ({ username, password }: Credentials) => {
-    await api()
-      .post("/auth/login", {
+    await axios
+      .post(`${process.env.REACT_APP_LOGIN_API_URL}/auth/login`, {
         username,
         password,
       })
-      .then((user: User) => {
+      .then(({ data: user }: { data: User }) => {
         setUser(user);
         localStorage.setItem("auth", user.token);
         return true;
