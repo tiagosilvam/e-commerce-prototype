@@ -59,7 +59,7 @@ export const BasicModal = () => {
             <Typography>
               Por limitações das APIs utilizadas, algumas acões foram realizadas
               via frontend, entre elas: Carrinho e busca por produtos. Por
-              limitaçãoes a sessão de favoritos não foi desenvolvida.
+              limitaçãoes, a sessão de favoritos não foi desenvolvida.
             </Typography>
             <Typography>
               Este projeto não teve como foco a realização fictícia de
